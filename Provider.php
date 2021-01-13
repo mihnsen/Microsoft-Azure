@@ -17,14 +17,7 @@ class Provider extends AbstractProvider
      *
      * @var string
      */
-    protected $graphUrl = 'https://graph.windows.net/myorganization/me';
-
-    /**
-     * The Graph API version for the request.
-     *
-     * @var string
-     */
-    protected $version = '1.5';
+    protected $graphUrl = 'https://graph.microsoft.com/v1.0/me/';
 
     /**
      * {@inheritdoc}
@@ -62,9 +55,6 @@ class Provider extends AbstractProvider
     protected function getUserByToken($token)
     {
         $response = $this->getHttpClient()->get($this->graphUrl, [
-            'query' => [
-                'api-version' => $this->version,
-            ],
             'headers' => [
                 'Accept'        => 'application/json',
                 'Authorization' => 'Bearer '.$token,
@@ -80,7 +70,7 @@ class Provider extends AbstractProvider
     protected function mapUserToObject(array $user)
     {
         return (new User())->setRaw($user)->map([
-            'id'    => $user['objectId'], 'nickname' => null, 'name' => $user['displayName'],
+            'id'    => $user['id'], 'nickname' => null, 'name' => $user['displayName'],
             'email' => $user['userPrincipalName'], 'avatar' => null,
         ]);
     }
@@ -91,8 +81,8 @@ class Provider extends AbstractProvider
     protected function getTokenFields($code)
     {
         return array_merge(parent::getTokenFields($code), [
-            'grant_type' => 'client_credentials',
-            'resource'   => 'https://graph.microsoft.com/',
+            'grant_type' => 'authorization_code',
+            'resource'   => 'https://graph.microsoft.com',
         ]);
     }
 
